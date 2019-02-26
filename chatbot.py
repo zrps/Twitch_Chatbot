@@ -36,7 +36,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         # Create IRC bot connection
         server = 'irc.chat.twitch.tv'
         port = 6667
-        print 'Connecting to ' + server + ' on port ' + str(port) + '...'
+        print('Connecting to ' + server + ' on port ' + str(port) + '...')
         irc.bot.SingleServerIRCBot.__init__(self, [(server, port, 'oauth:'+token)], username, username)
 
     # def choose(self):
@@ -53,7 +53,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
     #         return True
 
     def on_welcome(self, c, e):
-        print 'Joining ' + self.channel
+        print('Joining ' + self.channel)
 
         # You must request specific capabilities before you can use them
         c.cap('REQ', ':twitch.tv/membership')
@@ -65,7 +65,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         try:
             t1 = Thread(target=self.run).start()
         except (KeyboardInterrupt, SystemExit):
-            print '\nKeyboard Interrupt, exiting threading'
+            print('\nKeyboard Interrupt, exiting threading')
             t1.join()
 
 

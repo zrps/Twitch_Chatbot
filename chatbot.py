@@ -39,19 +39,19 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         print 'Connecting to ' + server + ' on port ' + str(port) + '...'
         irc.bot.SingleServerIRCBot.__init__(self, [(server, port, 'oauth:'+token)], username, username)
 
-    '''def choose(self):
-        c = self.connection
-        if not self.entries:
-            c.privmsg(self.channel, 'No entries received. Trying again')
-            return False
-        else:
-            choice = random.choice(self.entries)
-            c.privmsg(self.channel, '/host ' + choice)
-            c.privmsg(self.channel, 'Now hosting '+ choice)
-            del self.entries[:]
-            self.entries = list()
-            return True
-    '''
+    # def choose(self):
+    #     c = self.connection
+    #     if not self.entries:
+    #         c.privmsg(self.channel, 'No entries received. Trying again')
+    #         return False
+    #     else:
+    #         choice = random.choice(self.entries)
+    #         c.privmsg(self.channel, '/host ' + choice)
+    #         c.privmsg(self.channel, 'Now hosting '+ choice)
+    #         del self.entries[:]
+    #         self.entries = list()
+    #         return True
+
     def on_welcome(self, c, e):
         print 'Joining ' + self.channel
 
@@ -68,79 +68,79 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
             print '\nKeyboard Interrupt, exiting threading'
             t1.join()
 
-    '''
-    def run(self):
-        is_streaming = False
-        are_entries = False
-        while True:
-            if is_streaming == True:
-                is_streaming = self.cur_streaming()
-            else:
-                is_streaming = self.timer_get()
-                are_entries = self.choose()
-                if are_entries == True:
-                    is_streaming = self.timer_hosting()
 
+    # def run(self):
+    #     is_streaming = False
+    #     are_entries = False
+    #     while True:
+    #         if is_streaming == True:
+    #             is_streaming = self.cur_streaming()
+    #         else:
+    #             is_streaming = self.timer_get()
+    #             are_entries = self.choose()
+    #             if are_entries == True:
+    #                 is_streaming = self.timer_hosting()
+    #
+    #
+    # def cur_streaming(self):
+    #     streaming = True
+    #     while streaming == True:
+    #         url = 'https://api.twitch.tv/kraken/streams/' + self.channel_id
+    #         headers = {'Client-ID': self.client_id, 'Accept': 'application/vnd.twitchtv.v5+json'}
+    #         try:
+    #             r = requests.get(url, headers=headers).json()
+    #         except ValueError:
+    #             continue
+    #         except requests.exceptions.ConnectionError:
+    #             continue
+    #         if not r['stream']:
+    #             streaming = False
+    #         sleep(1)
+    #     return False
+    #     #self.timer_get()
+    #
+    # def timer_get(self):
+    #     c = self.connection
+    #     c.privmsg(self.channel, 'Input !hostme NOW for a chance to be hosted!')
+    #     time = 60 * 2
+    #     for i in range(time):
+    #         url = 'https://api.twitch.tv/kraken/streams/' + self.channel_id
+    #         headers = {'Client-ID': self.client_id, 'Accept': 'application/vnd.twitchtv.v5+json'}
+    #         try:
+    #             r = requests.get(url, headers=headers).json()
+    #         except ValueError:
+    #             continue
+    #         except requests.exceptions.ConnectionError:
+    #             continue
+    #         try:
+    #             if r['stream']:
+    #                 return True
+    #         except KeyError:
+    #             continue
+    #         sleep(1)
+    #     return False
+    #
+    # def timer_hosting(self):
+    #     c = self.connection
+    #     time = 60 * 20
+    #     for i in range(time):
+    #         url = 'https://api.twitch.tv/kraken/streams/' + self.channel_id
+    #         headers = {'Client-ID': self.client_id, 'Accept': 'application/vnd.twitchtv.v5+json'}
+    #         try:
+    #             r = requests.get(url, headers=headers).json()
+    #         except ValueError:
+    #             continue
+    #         except requests.exceptions.ConnectionError:
+    #             continue
+    #         try:
+    #             if r['stream']:
+    #                 return True
+    #         except KeyError:
+    #             continue
+    #         sleep(1)
+    #     c.privmsg(self.channel, '/unhost')
+    #     return False
 
-    def cur_streaming(self):
-        streaming = True
-        while streaming == True:
-            url = 'https://api.twitch.tv/kraken/streams/' + self.channel_id
-            headers = {'Client-ID': self.client_id, 'Accept': 'application/vnd.twitchtv.v5+json'}
-            try:
-                r = requests.get(url, headers=headers).json()
-            except ValueError:
-                continue
-            except requests.exceptions.ConnectionError:
-                continue
-            if not r['stream']:
-                streaming = False
-            sleep(1)
-        return False
-        #self.timer_get()
-    
-    def timer_get(self):
-        c = self.connection
-        c.privmsg(self.channel, 'Input !hostme NOW for a chance to be hosted!')
-        time = 60 * 2
-        for i in range(time):
-            url = 'https://api.twitch.tv/kraken/streams/' + self.channel_id
-            headers = {'Client-ID': self.client_id, 'Accept': 'application/vnd.twitchtv.v5+json'}
-            try:
-                r = requests.get(url, headers=headers).json()
-            except ValueError:
-                continue
-            except requests.exceptions.ConnectionError:
-                continue
-            try:
-                if r['stream']:
-                    return True
-            except KeyError:
-                continue
-            sleep(1)
-        return False
-
-    def timer_hosting(self):
-        c = self.connection
-        time = 60 * 20
-        for i in range(time):
-            url = 'https://api.twitch.tv/kraken/streams/' + self.channel_id
-            headers = {'Client-ID': self.client_id, 'Accept': 'application/vnd.twitchtv.v5+json'}
-            try:
-                r = requests.get(url, headers=headers).json()
-            except ValueError:
-                continue
-            except requests.exceptions.ConnectionError:
-                continue
-            try:
-                if r['stream']:
-                    return True
-            except KeyError:
-                continue
-            sleep(1)
-        c.privmsg(self.channel, '/unhost')
-        return False
-    '''
     def on_pubmsg(self, c, e):
         # If a chat message starts with an exclamation point, try to run it as a command
         if e.arguments[0][:1] == '!':
@@ -181,29 +181,29 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
             r = requests.get(url, headers=headers).json()
             c.privmsg(self.channel, 'Internal-Scream')
 
-        elif cmd == "hostme":
-            channel = self.channel.split('#')[1]
-            #print user_name
-            if user_name == channel:
-                c.privmsg(self.channel, 'You can\'t host yourself!')
-            else:
-                url = 'https://api.twitch.tv/kraken/channels/' + self.channel_id
-                headers = {'Client-ID': self.client_id, 'Accept': 'application/vnd.twitchtv.v5+json'}
-                try:
-                    r = requests.get(url, headers=headers).json()
-                    self.entries.append(user_name)
-                    c.privmsg(self.channel, user_name + ' has been added to the host list')
-                except ValueError:
-                    c.privmsg(self.channel, user_name + ', a problem has occurred. Please type !hostme again.')
-                #c.privmsg(self.channel, '/host ' + user_name)
+        # elif cmd == "hostme":
+        #     channel = self.channel.split('#')[1]
+        #     #print user_name
+        #     if user_name == channel:
+        #         c.privmsg(self.channel, 'You can\'t host yourself!')
+        #     else:
+        #         url = 'https://api.twitch.tv/kraken/channels/' + self.channel_id
+        #         headers = {'Client-ID': self.client_id, 'Accept': 'application/vnd.twitchtv.v5+json'}
+        #         try:
+        #             r = requests.get(url, headers=headers).json()
+        #             self.entries.append(user_name)
+        #             c.privmsg(self.channel, user_name + ' has been added to the host list')
+        #         except ValueError:
+        #             c.privmsg(self.channel, user_name + ', a problem has occurred. Please type !hostme again.')
+        #         #c.privmsg(self.channel, '/host ' + user_name)
+        #
+        #         #print self.entries
 
-                #print self.entries
-
-        elif cmd == "hostlist":
-            url = 'https://api.twitch.tv/kraken/channels/' + self.channel_id + '/autohost/list'
-            headers = {'Client-ID': self.client_id, 'Accept': 'application/vnd.twitchtv.v5+json'}
-            r = requests.get(url, headers=headers).json()
-            print r
+        # elif cmd == "hostlist":
+        #     url = 'https://api.twitch.tv/kraken/channels/' + self.channel_id + '/autohost/list'
+        #     headers = {'Client-ID': self.client_id, 'Accept': 'application/vnd.twitchtv.v5+json'}
+        #     r = requests.get(url, headers=headers).json()
+        #     print r
 
         elif cmd == "status":
             channel = self.channel.split('#')[1]

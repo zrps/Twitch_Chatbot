@@ -16,7 +16,7 @@ from time import sleep
 import random
 from threading import Thread
 import json
-import urllib2
+#import urllib2
 
 
 class TwitchBot(irc.bot.SingleServerIRCBot):
@@ -61,12 +61,13 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         c.cap('REQ', ':twitch.tv/commands')
         c.join(self.channel)
         c.privmsg(self.channel, 'Starting ZachBot...')
+        #   Below code used for multithreading for hosting input
         #c.privmsg(self.channel, 'Input !hostme NOW for a chance to be hosted!')
-        try:
-            t1 = Thread(target=self.run).start()
-        except (KeyboardInterrupt, SystemExit):
-            print('\nKeyboard Interrupt, exiting threading')
-            t1.join()
+        # try:
+        #     t1 = Thread(target=self.run).start()
+        # except (KeyboardInterrupt, SystemExit):
+        #     print('\nKeyboard Interrupt, exiting threading')
+        #     t1.join()
 
 
     # def run(self):
@@ -149,6 +150,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
             user_name =  e.source.split('!')[0]
 #            print e
             cmd = e.arguments[0].split(' ')[0][1:]
+            cmd = cmd.lower()
             #print 'Received command: ' + cmd
             self.do_command(e, cmd, user_name)
         return
@@ -160,14 +162,14 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
             url = 'https://api.twitch.tv/kraken/channels/' + self.channel_id
             headers = {'Client-ID': self.client_id, 'Accept': 'application/vnd.twitchtv.v5+json'}
             r = requests.get(url, headers=headers).json()
-            c.privmsg(self.channel, r['display_name'] + ' is currently playing ' + r['game'])
+            c.privmsg(self.channel, r['display_name'] + ' is currently playing: ' + r['game'])
 
         # Poll the API the get the current status of the stream
         elif cmd == "title":
             url = 'https://api.twitch.tv/kraken/channels/' + self.channel_id
             headers = {'Client-ID': self.client_id, 'Accept': 'application/vnd.twitchtv.v5+json'}
             r = requests.get(url, headers=headers).json()
-            c.privmsg(self.channel, r['display_name'] + ' channel title is currently ' + r['status'])
+            c.privmsg(self.channel, r['display_name'] + ' channel title is currently: ' + r['status'])
 
         elif cmd == "hello":
             url = 'https://api.twitch.tv/kraken/channels/' + self.channel_id
@@ -179,7 +181,26 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
             url = 'https://api.twitch.tv/kraken/channels/' + self.channel_id
             headers = {'Client-ID': self.client_id, 'Accept': 'application/vnd.twitchtv.v5+json'}
             r = requests.get(url, headers=headers).json()
-            c.privmsg(self.channel, 'Internal-Scream')
+            c.privmsg(self.channel, 'PSN: Internal-Scream')
+
+        elif cmd == "switch":
+            url = 'https://api.twitch.tv/kraken/channels/' + self.channel_id
+            headers = {'Client-ID': self.client_id, 'Accept': 'application/vnd.twitchtv.v5+json'}
+            r = requests.get(url, headers=headers).json()
+            c.privmsg(self.channel, 'Switch Friend Code: SW-1828-2068-1404')
+
+        elif cmd == "commands":
+            url = 'https://api.twitch.tv/kraken/channels/' + self.channel_id
+            headers = {'Client-ID': self.client_id, 'Accept': 'application/vnd.twitchtv.v5+json'}
+            r = requests.get(url, headers=headers).json()
+            c.privmsg(self.channel, '')
+
+        # elif cmd == "uptime":
+        #     url = 'https://api.twitch.tv/kraken/channels/' + self.channel_id
+        #     headers = {'Client-ID': self.client_id, 'Accept': 'application/vnd.twitchtv.v5+json'}
+        #     r = requests.get(url, headers=headers).json()
+        #     print(r)
+
 
         # elif cmd == "hostme":
         #     channel = self.channel.split('#')[1]

@@ -193,7 +193,8 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
             url = 'https://api.twitch.tv/kraken/channels/' + self.channel_id
             headers = {'Client-ID': self.client_id, 'Accept': 'application/vnd.twitchtv.v5+json'}
             r = requests.get(url, headers=headers).json()
-            c.privmsg(self.channel, '')
+            c.privmsg(self.channel, '!hello, !game, !title, !psn, !switch, !status, !lurk, !platform, !delay, !rez, !uptime')
+
 
         # elif cmd == "uptime":
         #     url = 'https://api.twitch.tv/kraken/channels/' + self.channel_id
@@ -259,6 +260,54 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
 
         elif cmd == "lurk" or cmd == "lurking":
             c.privmsg(self.channel, user_name + ", thanks for lurking!")
+
+        elif cmd == "platform":
+            url = 'https://api.twitch.tv/kraken/streams/' + self.channel_id
+            headers = {'Client-ID': self.client_id, 'Accept': 'application/vnd.twitchtv.v5+json'}
+            r = requests.get(url, headers=headers).json()
+            c.privmsg(self.channel, "System: "+r['stream']['broadcast_platform'])
+
+        elif cmd == "delay":
+            url = 'https://api.twitch.tv/kraken/streams/' + self.channel_id
+            headers = {'Client-ID': self.client_id, 'Accept': 'application/vnd.twitchtv.v5+json'}
+            r = requests.get(url, headers=headers).json()
+            c.privmsg(self.channel, "Delay: "+str(r['stream']['delay']))
+
+        elif cmd == "rez":
+            url = 'https://api.twitch.tv/kraken/streams/' + self.channel_id
+            headers = {'Client-ID': self.client_id, 'Accept': 'application/vnd.twitchtv.v5+json'}
+            r = requests.get(url, headers=headers).json()
+            c.privmsg(self.channel, "Resolution: "+str(r['stream']['video_height'])+"p")
+
+        elif cmd == "uptime":
+            url = 'https://api.twitch.tv/kraken/streams/' + self.channel_id
+            headers = {'Client-ID': self.client_id, 'Accept': 'application/vnd.twitchtv.v5+json'}
+            r = requests.get(url, headers=headers).json()
+            #print(r)
+            try:
+
+                start = r['stream']['created_at']
+                #to_split = start.split('T')
+                #date = to_split[0]
+                #time = to_split[1]
+                #for letter in "Z":
+                #time = time.replace('Z', '')
+                start = start.replace('T', ' ')#need space
+                start = start.replace('Z', '')#do not need space
+                from datetime import datetime
+                #e.g. 2014-06-07T04:24:32Z
+                #"%Y-%m-%d %H:%M:%S
+                #print(start)
+                to_start = datetime.strptime(start, '%Y-%m-%d %H:%M:%S')
+                str_len = datetime.utcnow() - to_start
+                #print(str_len)
+                str_len = str(str_len)
+                c.privmsg(self.channel, str_len)
+
+            except Exception as e:
+                temp_msg = "Not Live"
+                c.privmsg(self.channel, temp_msg)
+
 
         # The command was not recognized
         else:

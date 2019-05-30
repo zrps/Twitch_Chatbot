@@ -69,6 +69,12 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         #     print('\nKeyboard Interrupt, exiting threading')
         #     t1.join()
 
+    def get_JSON(self, user_id):
+        url = 'https://api.twitch.tv/helix/users?login=' + user_id
+        headers = {'Client-ID': self.client_id, 'Accept': 'application/vnd.twitchtv.v5+json'}
+        r = requests.get(url, headers=headers).json()
+        print(r)
+        return r
 
     # def run(self):
     #     is_streaming = False
@@ -188,6 +194,55 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
             headers = {'Client-ID': self.client_id, 'Accept': 'application/vnd.twitchtv.v5+json'}
             r = requests.get(url, headers=headers).json()
             c.privmsg(self.channel, 'Switch Friend Code: SW-1828-2068-1404')
+
+        elif cmd == "r3poopooqt" or cmd == "r3trace":
+            url = 'https://api.twitch.tv/kraken/channels/' + self.channel_id
+            headers = {'Client-ID': self.client_id, 'Accept': 'application/vnd.twitchtv.v5+json'}
+            r = requests.get(url, headers=headers).json()
+            c.privmsg(self.channel, 'BEEP BOOP I\'M A CUTIE')  # Thank you Guaconmysock
+
+        elif cmd == "followage" or cmd == "followtime":
+            #r_to = self.get_JSON(self.channel_id)
+            #print(r_to)
+
+            url = 'https://api.twitch.tv/helix/users?login=' + user_name
+            headers = {'Client-ID': self.client_id, 'Accept': 'application/vnd.twitchtv.v5+json'}
+            r = requests.get(url, headers=headers).json()
+
+            #print(r)
+            #print(r['data'][0]['id'])
+            from_id = r['data'][0]['id']
+            #id_url = 'https://api.twitch.tv/helix/users/follows?from_id=' + user_id
+            #print(id_url)
+            # https://api.twitch.tv/helix/users/follows?first=1&from_id=1336&to_id=1337
+            if from_id == self.channel_id:
+                c.privmsg(self.channel, 'You can\'t follow yourself, ' + user_name + '!')
+            else:
+                id_url = 'https://api.twitch.tv/helix/users/follows?first=1&from_id=' + from_id + '&to_id=' + self.channel_id
+                headers_2 = {'Client-ID': self.client_id, 'Accept': 'application/vnd.twitchtv.v5+json'}
+                r_2 = requests.get(id_url, headers=headers_2).json()
+                #print(r_2)
+                try:
+                    follow_date = r_2['data'][0]['followed_at']
+                    follow_date = follow_date.replace('T', ' ')  # need space
+                    follow_date = follow_date.replace('Z', '')  # do not need space
+                    from datetime import datetime
+                    # e.g. 2014-06-07T04:24:32Z
+                    # "%Y-%m-%d %H:%M:%S
+                    # print(start)
+                    to_start = datetime.strptime(follow_date, '%Y-%m-%d %H:%M:%S')
+                    str_len = datetime.utcnow() - to_start
+                    # print(str_len)
+                    str_len = str(str_len)
+                    c.privmsg(self.channel, user_name + ' has been following ' + self.channel + ' ' + str_len)
+
+                except KeyError:
+                    c.privmsg(self.channel, user_name + ' is not following ' + self.channel)
+                except IndexError:
+                    c.privmsg(self.channel, user_name + ' is not following ' + self.channel)
+
+
+            #c.privmsg(self.channel, r)
 
         elif cmd == "commands":
             url = 'https://api.twitch.tv/kraken/channels/' + self.channel_id
@@ -312,6 +367,8 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         # The command was not recognized
         else:
             c.privmsg(self.channel, "Did not understand command: " + cmd)
+
+
 
 
 
